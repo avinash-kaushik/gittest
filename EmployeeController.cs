@@ -26,14 +26,12 @@ namespace EmployeeCollection.WebAPI.Controllers
         {
             try
             {
-                int maxId;
                 if (employee.Id == 0)
                 {
-                    maxId = this._empService.GetLastEmpployeeId();
-                    employee.Id = maxId + 1;
+                    employee.Id = _empService.GetLastEmpployeeId() + 1;
                 }
 
-                this._empService.AddEmployee(employee);
+                _empService.AddEmployee(employee);
 
                 return new JsonResult(employee)
                 {
@@ -42,7 +40,7 @@ namespace EmployeeCollection.WebAPI.Controllers
             }
             catch
             {
-                return new JsonResult("Failue")
+                return new JsonResult(employee)
                 {
                     StatusCode = StatusCodes.Status500InternalServerError
                 };
@@ -90,7 +88,7 @@ namespace EmployeeCollection.WebAPI.Controllers
                     datafilter.Age = new List<int> { int.Parse(age) }.ToArray();
                 }
 
-                var records = await this._empService.GetEmployees(null, datafilter);
+                var records = await _empService.GetEmployees(null, datafilter);
 
                 return new JsonResult(records)
                 {
@@ -99,7 +97,7 @@ namespace EmployeeCollection.WebAPI.Controllers
             }
             catch
             {
-                return new JsonResult("Failue")
+                return new JsonResult("Error")
                 {
                     StatusCode = StatusCodes.Status500InternalServerError
                 };
@@ -107,7 +105,7 @@ namespace EmployeeCollection.WebAPI.Controllers
 
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -116,7 +114,7 @@ namespace EmployeeCollection.WebAPI.Controllers
             try
             {
                 int[] ids = new int[] { id };
-                var records = await this._empService.GetEmployees(ids, null);
+                var records = await _empService.GetEmployees(ids, null);
                 return new JsonResult(records)
                 {
                     StatusCode = (records.Count > 0) ? StatusCodes.Status200OK : StatusCodes.Status404NotFound
@@ -124,7 +122,7 @@ namespace EmployeeCollection.WebAPI.Controllers
             }
             catch
             {
-                return new JsonResult("Failue")
+                return new JsonResult(id)
                 {
                     StatusCode = StatusCodes.Status500InternalServerError
                 };
@@ -132,7 +130,7 @@ namespace EmployeeCollection.WebAPI.Controllers
 
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -142,7 +140,7 @@ namespace EmployeeCollection.WebAPI.Controllers
             try
             {
                 int[] ids = new int[] { id };
-                var records = await this._empService.GetEmployees(ids, null);
+                var records = await _empService.GetEmployees(ids, null);
 
                 if (records.Count == 0)
                 {
@@ -154,7 +152,7 @@ namespace EmployeeCollection.WebAPI.Controllers
                 else
                 {
                     Employee firstrec = records.Where(x => x.Id == id).FirstOrDefault();
-                    var result = await this._empService.DeleteEmployee(firstrec);
+                    var result = await _empService.DeleteEmployee(firstrec);
                     return new JsonResult(id)
                     {
                         StatusCode = StatusCodes.Status204NoContent
@@ -163,7 +161,7 @@ namespace EmployeeCollection.WebAPI.Controllers
             }
             catch
             {
-                return new JsonResult("Failue")
+                return new JsonResult(id)
                 {
                     StatusCode = StatusCodes.Status500InternalServerError
                 };
